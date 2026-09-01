@@ -117,14 +117,22 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
     private static Icon LoadAppIcon()
     {
-        using Stream? stream = typeof(TrayApplicationContext).Assembly
-            .GetManifestResourceStream("PaperEX.Caffeine.Resources.app.ico");
-        if (stream is null)
+        try
         {
+            using Stream? stream = typeof(TrayApplicationContext).Assembly
+                .GetManifestResourceStream("PaperEX.Caffeine.Resources.app.ico");
+            if (stream is not null)
+            {
+                return new Icon(stream);
+            }
+
             Debug.WriteLine("Embedded app icon not found; using the default application icon.");
-            return SystemIcons.Application;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to load the embedded icon ({ex.Message}); using the default application icon.");
         }
 
-        return new Icon(stream);
+        return SystemIcons.Application;
     }
 }
